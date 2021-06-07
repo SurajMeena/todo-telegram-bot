@@ -1,11 +1,13 @@
+import numpy as np
 from bot import bot
+import re, sys, time
+import asyncio, logging
 from pyrogram import filters
 from firebase_admin import db
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from .utils import grouporprivate,msg_list_from_db,create_list_buttons,create_buttons,get_data,InlineButtonEdit,addtodoitems,remove_all_specific_element,check_is_duplicate_item ,push_db
-import re
-import logging
-import numpy as np
+from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
+
 
 @bot.on_message(group=2)
 async def my_handler(client, message):
@@ -48,7 +50,7 @@ async def my_handler(client, message):
             else:
                 await bot.send_message(chat_id, "Please start todobot using /start@todogroup_bot")
     except Exception as e:
-        # app.send_message(message.chat.id, "You have made multiple requests at the same time, please use /start@todogroup_bot to refresh the list")
+        # bot.send_message(message.chat.id, "You have made multiple requests at the same time, please use /start@todogroup_bot to refresh the list")
         logging.error(f"trouble in adding a msg containing hashtag into list [{chat_id}]", exc_info=True)
 
 @bot.on_message(filters.command(["start", "start@todogroup_bot"], prefixes=["/", "/"]), group=1)
@@ -75,7 +77,7 @@ async def new_command(client, message):
     if len(txt) != 0:
         inline_msg_id_node=db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
         if(inline_msg_id_node is None):
-            msg = await app.send_message(chat_id, "Please use /start@todogroup_bot command atleast once for using this bot")
+            msg = await bot.send_message(chat_id, "Please use /start@todogroup_bot command atleast once for using this bot")
         else:
             lst, is_duplicate_item = addtodoitems(todotype, "newtodo", message)
             if(is_duplicate_item):
@@ -90,7 +92,7 @@ async def tracklist_handler(client, message):
     todotype = grouporprivate(message)
     inline_msg_id = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
     if(inline_msg_id is None):
-        msg = await app.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
+        msg = await bot.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
         return
     if(len(txt) == 0):
         return
@@ -99,15 +101,16 @@ async def tracklist_handler(client, message):
     hashtags_lst = remove_all_specific_element(hashtags_lst, " ")
     for listname in hashtags_lst:
         if len(listname) > 36:
-            hashtags_lst.remove(i)
+            hashtags_lst.remove(listname)
             await bot.send_message(chat_id, "Fuck Off! What are you writing ? Ramayana")
-        hash_str = "#" + listname
-        matched = re.match("^#\w+$", hash_str)
-        if not bool(matched):
-            return
         else:
-            todo_ref,is_duplicate_item = push_db(todotype, message, "trackedlist", listname)
-            await bot.show_list_in_keyboard(todotype, chat_id, "trackedlist", message)
+            hash_str = "#" + listname
+            matched = re.match("^#\w+$", hash_str)
+            if not bool(matched):
+                return
+            else:
+                todo_ref,is_duplicate_item = push_db(todotype, message, "trackedlist", listname)
+                await bot.show_list_in_keyboard(todotype, chat_id, "trackedlist", message)
 
 @bot.on_message(filters.command(["ignore", "ignore@todogroup_bot"]), group=1)
 async def ignore_handler(client, message):

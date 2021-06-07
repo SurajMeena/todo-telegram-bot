@@ -1,6 +1,6 @@
 from bot import bot
 from firebase_admin import db
-from .utils import Filter,inline_results,inline_results_1,msg_list_from_db
+from .utils import Filter, inline_results, inline_results_1, msg_list_from_db
 
 @bot.on_inline_query()
 async def answer(client, inline_query):
