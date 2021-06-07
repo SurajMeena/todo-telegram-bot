@@ -1,0 +1,5 @@
+pyrogram
+tgcrypto
+numpy
+python_dotenv
+firebase_admin
