@@ -70,9 +70,13 @@ async def start_command(client, message):
 @bot.on_message(filters.command(["new", "new@todogroup_bot"]), group=1)
 async def new_command(client, message):
     txt = " ".join(message.text.split(" ")[1:])
-    txt = txt.strip()
-    chat_id = message.chat.id
     todotype = grouporprivate(message)
+    chat_id = message.chat.id
+    inline_msg_id = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
+    if(inline_msg_id is None):
+        msg = await bot.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
+        return
+    txt = txt.strip()
     # txt = message.text[1:]
     if len(txt) != 0:
         inline_msg_id_node=db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
@@ -117,6 +121,12 @@ async def ignore_handler(client, message):
     todotype = grouporprivate(message)
     chat_id = message.chat.id
     txt = " ".join(message.text.split(" ")[1:])
+    inline_msg_id = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
+    if(inline_msg_id is None):
+        msg = await bot.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
+        return
+    if(len(txt) == 0):
+        return
     hashtags_lst = txt.split(",")
     hashtags_lst = list(np.char.strip(hashtags_lst))
     hashtags_lst = remove_all_specific_element(hashtags_lst, " ")
@@ -134,6 +144,10 @@ async def tracked(client, message):
     hashtag_lsts = []
     chat_id = message.chat.id
     todotype = grouporprivate(message)
+    inline_msg_id = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
+    if(inline_msg_id is None):
+        msg = await bot.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
+        return
     todo_ref = db.reference("/{}/{}".format(todotype, chat_id)).get()
     if(todo_ref is None):
         await bot.send_message(chat_id, "Currently no hashtag is tracked, Use /start followed by `/tracklists hashtag1,hashtag2` for tracking hashtags", parse_mode="md")
@@ -157,17 +171,20 @@ async def tracked(client, message):
 
 @bot.on_message(filters.command(["help", "help@todogroup_bot"]), group=1)
 async def help_handler(client, message):
-    await bot.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time \n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot \n**Bonus:** you can use the bot inline to access your lists quickly. Type `list_name` in inline query to see it's content as inline results and type listname initials to see all lists matching the initials. Inline can only be used if you have interacted privately with bot to create lists", parse_mode="md")
+    await bot.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time. Watch [this](https://t.me/help_todogroup_bot/4)\n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list. Watch [this](https://t.me/help_todogroup_bot/4) \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags. Watch [this](https://t.me/help_todogroup_bot/4) \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot.\n\nHelp [channel](https://t.me/help_todogroup_bot) and Help [group](https://t.me/help_todogroup_chat) for usage, help, suggestions, etc.", parse_mode="md", disable_web_page_preview=True)
 
 
 @bot.on_message(filters.command(["delete", "delete@todogroup_bot"]), group=1)
 async def delete_handler(client, message):
     msg_text = " ".join(message.text.split(" ")[1:])
-    if len(msg_text) == 0:
-        return
-
     chat_id = message.chat.id
     todotype = grouporprivate(message)
+    inline_msg_id = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
+    if(inline_msg_id is None):
+        msg = await bot.send_message(chat_id, "Please start todobot alteast once by using /start@todogroup_bot")
+        return
+    if len(msg_text) == 0:
+        return
     delete_items = msg_text.split(",")
     delete_items = remove_all_specific_element(delete_items, " ")
 
@@ -266,7 +283,7 @@ async def my_handler(client, callback_query):
                 await callback_query.answer(f"Uh-oh...Slow down, Please wait {e.x} seconds to get refreshed view", show_alert=True)
                 time.sleep(e.x)
             except MessageNotModified as e:
-                logging.info(f"Got message not modified while adding {msg_id} in {chat_id}")
+                logging.info(f"Got message not modified while deleting. {msg_id} and {chat_id}")
             except Exception as e:
                 logging.critical(f"Facing issues in deletion of tasks in a list in {msg_id} in {chat_id}", exc_info=True)
 

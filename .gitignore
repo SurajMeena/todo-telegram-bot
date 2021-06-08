@@ -2,5 +2,5 @@
 *.ini
 .env
 *.log
-todogroupbot-db-firebase-adminsdk-nulpi-66455cc53c.json
-
+*.json
+*.pyc
