@@ -8,7 +8,7 @@ from firebase_admin import db
 from configparser import ConfigParser
 from pyrogram.errors import FloodWait, MessageNotModified, ButtonDataInvalid, MessageEditTimeExpired
 from pyrogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from .plugins.utils import msg_list_from_db,get_data,create_list_buttons,InlineButtonEdit
+from .plugins.utils import msg_list_from_db, create_list_buttons, InlineButtonEdit
 
 class bot(Client):
     def __init__(self, name):
@@ -36,7 +36,7 @@ class bot(Client):
         print("bot stopped. Bye.")
 
 
-    def create_list(self,todotype, message):
+    def create_list(self, todotype, message):
         chat_id = message.chat.id
         list_btns = create_list_buttons(todotype, chat_id)
         buttons = [[]]
@@ -62,10 +62,25 @@ class bot(Client):
             )
         return msg
 
+    async def get_data(self, data, from_usr):
+        lst_data = ""
+        j = 1
+        if len(from_usr) != 0:
+            for i, k in zip(data, from_usr):
+                lst_data += str(j) + "." + " "
+                usr = await super().get_users(k)
+                lst_data += i + "|" + usr.mention(style="md") + "\n"
+                j += 1
+        else:
+            for i in data:
+                lst_data += str(j) + "." + " "
+                lst_data += i + "\n"
+                j += 1
+        return lst_data
 
-    async def show_list_in_keyboard(self,todotype, chat_id, hashtagtext, message):
-        msg_list = msg_list_from_db(todotype, chat_id, hashtagtext)
-        lst_data = get_data(msg_list)
+    async def show_list_in_keyboard(self, todotype, chat_id, hashtagtext, message):
+        msg_list, from_usr = msg_list_from_db(todotype, chat_id, hashtagtext)
+        lst_data = await self.get_data(msg_list, from_usr)
         updated_reply_msg = "This is a hashtag {} list \n".format(hashtagtext) + lst_data
         inline_msg_id_node = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
         try:

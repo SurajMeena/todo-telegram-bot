@@ -5,7 +5,7 @@ import asyncio, logging
 from pyrogram import filters
 from firebase_admin import db
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from .utils import grouporprivate,msg_list_from_db,create_list_buttons,create_buttons,get_data,InlineButtonEdit,addtodoitems,remove_all_specific_element,check_is_duplicate_item ,push_db
+from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db
 from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
 
@@ -29,8 +29,8 @@ async def my_handler(client, message):
     try:
         if tracked_lists_not_empty:
             for hashtag, hashtagtext in hashtags:
-                tracked_list = msg_list_from_db(todotype, chat_id, "trackedlist")
-                ignore_lst = msg_list_from_db(todotype, chat_id, "ignore_lst")
+                tracked_list, from_usr = msg_list_from_db(todotype, chat_id, "trackedlist")
+                ignore_lst, from_usr = msg_list_from_db(todotype, chat_id, "ignore_lst")
                 if hashtagtext in ignore_lst:
                     return
                 if hashtagtext in tracked_list:
@@ -130,7 +130,7 @@ async def ignore_handler(client, message):
     hashtags_lst = txt.split(",")
     hashtags_lst = list(np.char.strip(hashtags_lst))
     hashtags_lst = remove_all_specific_element(hashtags_lst, " ")
-    tracked_hashtags = msg_list_from_db(todotype, chat_id, "trackedlist")
+    tracked_hashtags, from_usr = msg_list_from_db(todotype, chat_id, "trackedlist")
     for i in hashtags_lst:
         if i in tracked_hashtags:
             await bot.send_message(chat_id, f"Uh-oh there is a clash, `{i}` is already in tracked lists")
@@ -152,7 +152,7 @@ async def tracked(client, message):
     if(todo_ref is None):
         await bot.send_message(chat_id, "Currently no hashtag is tracked, Use /start followed by `/tracklists hashtag1,hashtag2` for tracking hashtags", parse_mode="md")
         return
-    tracked_hashtags = msg_list_from_db(todotype, chat_id, "trackedlist")
+    tracked_hashtags, from_usr = msg_list_from_db(todotype, chat_id, "trackedlist")
     if(len(tracked_hashtags) == 0):
         await bot.send_message(chat_id, "Currently no hashtag is tracked, use `/tracklists hashtag1,hashtag2` for tracking hashtags", parse_mode="md")
     else:
@@ -223,8 +223,8 @@ async def my_handler(client, callback_query):
             keys.append(key)
     if msg_id == bot_msg_id:
         if callbackdata in keys:
-            msg_list = msg_list_from_db(todotype, chat_id, callbackdata)
-            lst_data = get_data(msg_list)
+            msg_list, from_usr = msg_list_from_db(todotype, chat_id, callbackdata)
+            lst_data = await bot.get_data(msg_list, from_usr)
             try:
                 await bot.edit_message_text(chat_id, msg_id, "This is a hashtag {} list \n".format(callbackdata) + lst_data)
                 await bot.edit_message_reply_markup(

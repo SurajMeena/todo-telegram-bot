@@ -16,18 +16,6 @@ async def InlineButtonEdit():
 def Filter(string, substr):
     return [str for str in string if any(sub in str for sub in substr)]
 
-
-
-def get_data(data):
-    lst_data = ""
-    j = 1
-    for i in data:
-        lst_data += str(j) + "." + " "
-        lst_data += i + "\n"
-        j += 1
-    return lst_data
-
-
 def grouporprivate(message):
     isgroup_msg = message.chat.type == "group" or message.chat.type == "supergroup"
     typelist = "personaltodo"
@@ -119,18 +107,21 @@ def create_buttons(todotype, chat_id, hashtag):
     return buttons
 
 
-
 def msg_list_from_db(todotype, chat_id, hashtag):
     entries = db.reference("/{}/{}/{}".format(todotype, chat_id, hashtag)).get()
-    msg_list =[]
+    msg_list = []
+    from_usr = []
     if entries is None:
-        return msg_list
+        return msg_list, from_usr
     for key, value in entries.items():
         msg_list.append(value["msg"])
-    return msg_list
+        if todotype == "grouptodo":
+            from_usr.append(value["msg_from"])
+    return msg_list, from_usr
 
 def inline_results(title, task, thumb_link):
     return eval("InlineQueryResultArticle(title=title, input_message_content=InputTextMessageContent(task), thumb_url=thumb_link, description=task)")
+
 def inline_results_1(title, task, thumb_link):
     return eval("InlineQueryResultArticle(title=title, input_message_content=InputTextMessageContent(title), thumb_url=thumb_link, description=task)")
 
