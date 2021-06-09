@@ -38,13 +38,11 @@ def push_db(todotype, message, hashtagtext, msg_text):
     is_duplicate_item = False
     msg_from = "misc"
     chat_id = message.chat.id
+    # try and except for handling anonymous user
     try:
         msg_from = message.from_user.id
-    except AttributeError as e:
-        if message.author_signature is not None:
-            msg_from = message.author_signature
-        elif message.sender_chat.is_creator:
-            msg_from = message.sender_chat.type
+    except AttributeError:
+        msg_from = "anonymous"
     todo_hashtag_ref = db.reference("/{}/{}/{}".format(todotype, chat_id, hashtagtext))
     has_this_hashtag = todo_hashtag_ref.get(hashtagtext)[0] is not None
     todo_ref = db.reference("/{}/{}".format(todotype,chat_id))
@@ -65,18 +63,11 @@ def push_db(todotype, message, hashtagtext, msg_text):
 
 def addtodoitems(todotype, hashtagtext, message):
     msg_from = "misc"
+    # try and except for handling anonymous user
     try:
-        print("running try")
         msg_from = message.from_user.id
-    except AttributeError as e:
-        print("running except")
-        print(message.author_signature)
-        print(message.sender_chat.is_creator)
-        if message.author_signature:
-            msg_from = message.author_signature
-        elif message.sender_chat.is_creator:
-            print("why not running")
-            msg_from = message.sender_chat.type
+    except AttributeError:
+        msg_from = "anonymous"
     is_duplicate_item = False
     if hashtagtext == "newtodo":
         msg_text_list = message.text.split(' ')[1:]

@@ -73,7 +73,7 @@ class bot(Client):
                     lst_data += i + "|" + usr.mention(style="md") + "\n"
                 else:
                     usr = k
-                    lst_data += i + "|" + "@misc" + "\n"
+                    lst_data += i + "|`" + k + "`\n"
                 j += 1
         else:
             for i in data:

@@ -24,14 +24,11 @@ async def my_handler(client, message):
     hashtags = r.findall(msg_text)
     if(len(hashtags)==0):
         return
+    # try and except for handling anonymous user
     try:
         msg_from = message.from_user.id
     except AttributeError:
-        print("running")
-        if message.author_signature is not None:
-            msg_from = message.author_signature
-        elif message.sender_chat.is_creator:
-            msg_from = message.sender_chat.type
+        msg_from = "anonymous"
     tracked_list_ref = db.reference("/{}/{}/{}".format(todotype,chat_id,"trackedlist"))
     tracked_lists_not_empty = tracked_list_ref.get("trackedlist")[0] is not None
     try:

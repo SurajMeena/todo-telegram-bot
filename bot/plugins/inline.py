@@ -9,15 +9,15 @@ async def answer(client, inline_query):
     # thumb_url = "https://data.alemi.dev/todo-small.png"
     thumb_url = "https://imgur.com/9nahZuY.png"
     # thumb_url = "https://imgur.com/YxvePl2.png"
-    try:
-        from_usr = inline_query.from_user.id
-    except:
-        inline_options.append(inline_results("Ooops", "You are probably an anonymous admin, you can't access inline", thumb_url))
-        await inline_query.answer(
-        inline_options,
-        cache_time=1
-        )
-        return
+    # try:
+    from_usr = inline_query.from_user.id
+    # except:
+    #     inline_options.append(inline_results("Ooops", "You are probably an anonymous admin, you can't access inline", thumb_url))
+    #     await inline_query.answer(
+    #     inline_options,
+    #     cache_time=1
+    #     )
+    #     return
     lst_name = inline_query.query
     todo_ref = db.reference("/{}/{}".format(todotype, from_usr)).get()
     if todo_ref is None:
