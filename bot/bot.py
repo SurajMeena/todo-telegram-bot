@@ -68,8 +68,12 @@ class bot(Client):
         if len(from_usr) != 0:
             for i, k in zip(data, from_usr):
                 lst_data += str(j) + "." + " "
-                usr = await super().get_users(k)
-                lst_data += i + "|" + usr.mention(style="md") + "\n"
+                if isinstance(k, int):
+                    usr = await super().get_users(k)
+                    lst_data += i + "|" + usr.mention(style="md") + "\n"
+                else:
+                    usr = k
+                    lst_data += i + "|" + "@misc" + "\n"
                 j += 1
         else:
             for i in data:

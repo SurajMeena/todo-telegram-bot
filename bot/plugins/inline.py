@@ -9,7 +9,15 @@ async def answer(client, inline_query):
     # thumb_url = "https://data.alemi.dev/todo-small.png"
     thumb_url = "https://imgur.com/9nahZuY.png"
     # thumb_url = "https://imgur.com/YxvePl2.png"
-    from_usr = inline_query.from_user.id
+    try:
+        from_usr = inline_query.from_user.id
+    except:
+        inline_options.append(inline_results("Ooops", "You are probably an anonymous admin, you can't access inline", thumb_url))
+        await inline_query.answer(
+        inline_options,
+        cache_time=1
+        )
+        return
     lst_name = inline_query.query
     todo_ref = db.reference("/{}/{}".format(todotype, from_usr)).get()
     if todo_ref is None:
@@ -22,7 +30,7 @@ async def answer(client, inline_query):
         substr = [lst_name]
         filterd_list = Filter(hashtag_lst,substr)
         if lst_name in hashtag_lst:
-            msg_list, from_usr = msg_list_from_db(todotype, from_usr, lst_name)
+            msg_list, from_usr_lst = msg_list_from_db(todotype, from_usr, lst_name)
             for i, j in zip(msg_list, range(len(msg_list))):
                 try:
                     inline_options.append(inline_results_1(str(j+1)+". "+i, lst_name, thumb_url))
@@ -32,7 +40,7 @@ async def answer(client, inline_query):
             if(len(lst_name)==0):
                 filterd_list = hashtag_lst
             for lst_name in filterd_list:
-                msg_list, from_usr = msg_list_from_db(todotype, from_usr, lst_name)
+                msg_list, from_usr_lst = msg_list_from_db(todotype, from_usr, lst_name)
                 listname_data =""
                 for i in range(len(msg_list)):
                     listname_data += "{}. {} \n".format(i+1, msg_list[i])
