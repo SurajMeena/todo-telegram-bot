@@ -13,6 +13,9 @@ def InlineButtonKey(task):
 async def InlineButtonEdit():
     return eval("InlineKeyboardButton('Edit list/Show lists', callback_data='edit')")
 
+async def InlineButtonInline():
+    return eval("InlineKeyboardButton('Use Inline', switch_inline_query_current_chat='')")
+
 def Filter(string, substr):
     return [stri for stri in string if any(sub in stri for sub in substr)]
 
@@ -24,7 +27,7 @@ def grouporprivate(message):
     return typelist
 
 def check_is_duplicate_item(todotype,chat_id,hashtagtext,new_msg):
-    todo_hashtag_ref = db.reference("/{}/{}/{}".format(todotype,chat_id,hashtagtext))
+    todo_hashtag_ref = db.reference("/{}/{}/{}".format(todotype, chat_id, hashtagtext))
     if todo_hashtag_ref.get() is not None:
         for i in todo_hashtag_ref.get().items():
             value = i[1]
@@ -65,12 +68,12 @@ def push_db(todotype, message, hashtagtext, msg_text):
 def addtodoitems(todotype, hashtagtext, message):
     is_duplicate_item = False
     if hashtagtext == "newtodo":
-        msg_text_list = message.text.split(' ')[1:]
+        msg_text_list = message.text.markdown.split(' ')[1:]
         msg_text_list = list(np.char.strip(msg_text_list, " "))
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
     else:
-        msg_text_list = message.text.split(" ")
+        msg_text_list = message.text.markdown.split(" ")
         msg_text_list = list(np.char.strip(msg_text_list, " "))
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
@@ -107,7 +110,7 @@ def create_buttons(todotype, chat_id, hashtag):
     buttons = []
     entries = db.reference("/{}/{}/{}".format(todotype, chat_id, hashtag)).get()
     if entries != None:
-        for key,value in entries.items():
+        for key, value in entries.items():
             buttons.append([InlineButtonList((key + "___" + hashtag).encode(), value["msg"])])
     return buttons
 

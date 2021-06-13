@@ -8,7 +8,7 @@ import logging
 from pyrogram import filters
 from firebase_admin import db
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db
+from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db, InlineButtonInline
 from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
 
@@ -23,7 +23,7 @@ async def my_handler(client, message):
         return
     chat_id = message.chat.id
     todotype = grouporprivate(message)
-    msg_text = message.text
+    msg_text = message.text.markdown
     if(msg_text is None):
         return
     r = re.compile(r"(?:^|\s)([#])(\w+)")
@@ -91,7 +91,7 @@ async def new_command(client, message):
     new_command adds items in a separate list independent of hashtags.\
     Before pushing into database it also checks for duplicate entry.
     """
-    txt = " ".join(message.text.split(" ")[1:])
+    txt = " ".join(message.text.markdown.split(" ")[1:])
     todotype = grouporprivate(message)
     chat_id = message.chat.id
     inline_msg_id = db.reference(
@@ -295,7 +295,8 @@ async def callback_handler(client, callback_query):
                     chat_id, msg_id,
                     InlineKeyboardMarkup([
                         [
-                            await InlineButtonEdit()
+                            await InlineButtonEdit(),
+                            await InlineButtonInline(),
                         ]
                     ]))
                 logging.info(

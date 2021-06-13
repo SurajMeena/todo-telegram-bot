@@ -7,7 +7,7 @@ from firebase_admin import db
 from configparser import ConfigParser
 from pyrogram.errors import FloodWait, MessageNotModified, ButtonDataInvalid, MessageEditTimeExpired
 from pyrogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from .plugins.utils import msg_list_from_db, create_list_buttons, InlineButtonEdit
+from .plugins.utils import msg_list_from_db, create_list_buttons, InlineButtonEdit, InlineButtonInline
 
 # custom bot class inherited from client class in pyrogram 
 class bot(Client):
@@ -96,7 +96,8 @@ class bot(Client):
                 chat_id, inline_msg_id_node,
                 InlineKeyboardMarkup([
                     [
-                        await InlineButtonEdit(),
+                        await InlineButtonEdit(), 
+                        await InlineButtonInline(),
                     ]
                 ]))
             logging.info("Successfully added a task using commands new/tracklists/ignore or just on_message. Next lines provides more info on that")
