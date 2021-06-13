@@ -16,7 +16,8 @@ from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 async def my_handler(client, message):
     """Handler for messages containing hashtags
 
-    Finds whether a msg contains a hashtag or not. If yes, then processes it and saves it at appropriate place in database.
+    Finds whether a msg contains a hashtag or not. If yes, then processes it \
+    and saves it at appropriate place in database.
     """
     if(message.via_bot is not None):
         return
@@ -67,8 +68,9 @@ async def my_handler(client, message):
 
 @bot.on_message(filters.command(["start", "start@todogroup_bot"], prefixes=["/", "/"]), group=1)
 async def start_command(client, message):
-    """
-    Write something here
+    """Starts the bot
+    Starts the bot and sends an inline keyboard with lists that are already \
+    available in database. If no list available then sends a button for start guide
     """
     chat_id = message.chat.id
     is_group_msg = message.chat.type == "group" or message.chat.type == "supergroup"
@@ -84,6 +86,11 @@ async def start_command(client, message):
 
 @bot.on_message(filters.command(["new", "new@todogroup_bot"]), group=1)
 async def new_command(client, message):
+    """Creates an separate list named todo
+
+    new_command adds items in a separate list independent of hashtags.\
+    Before pushing into database it also checks for duplicate entry.
+    """
     txt = " ".join(message.text.split(" ")[1:])
     todotype = grouporprivate(message)
     chat_id = message.chat.id
@@ -97,7 +104,8 @@ async def new_command(client, message):
         inline_msg_id_node = db.reference(
             "/{}/{}/{}".format(todotype, chat_id, "bot_msg_id")).get("bot_msg_id")[0]
         if(inline_msg_id_node is None):
-            await bot.send_message(chat_id, "Please use /start@todogroup_bot command atleast once for using this bot")
+            await bot.send_message(chat_id, "Please use /start@todogroup_bot \
+                command atleast once for using this bot")
         else:
             is_duplicate_item = addtodoitems(todotype, "newtodo", message)[1]
             if(is_duplicate_item):
@@ -107,6 +115,13 @@ async def new_command(client, message):
 
 @bot.on_message(filters.command(["tracklists", "tracklists@todogroup_bot"]), group=1)
 async def tracklist_handler(client, message):
+    """Adds hashtags that needs to be tracked
+
+    Stores the list of hashtag names that needs to be tracked in future. \
+    Multiple entries are taken as input separated by commas. \
+    Hashtag names greater than 36 character length are not allowed. \
+    Also checks whether hashtag in input is valid hashtag or not.
+    """
     txt = " ".join(message.text.split(" ")[1:])
     chat_id = message.chat.id
     todotype = grouporprivate(message)
@@ -136,6 +151,11 @@ async def tracklist_handler(client, message):
 
 @bot.on_message(filters.command(["ignore", "ignore@todogroup_bot"]), group=1)
 async def ignore_handler(client, message):
+    """Add hashtags that needs to be ignored
+
+    Stores the list of hashtag names that need not be tracked in future. \
+    Multiple entries needs to be separated by commas.
+    """
     todotype = grouporprivate(message)
     chat_id = message.chat.id
     txt = " ".join(message.text.split(" ")[1:])
@@ -160,6 +180,10 @@ async def ignore_handler(client, message):
 
 @bot.on_message(filters.command(["showtrackedlists", "showtrackedlists@todogroup_bot"]), group=1)
 async def tracked(client, message):
+    """Return hashtag names that are being tracked currently
+
+    Output is returned in comma separated format.
+    """
     chat_id = message.chat.id
     todotype = grouporprivate(message)
     inline_msg_id = db.reference(
@@ -195,6 +219,11 @@ async def help_handler(client, message):
 
 @bot.on_message(filters.command(["delete", "delete@todogroup_bot"]), group=1)
 async def delete_handler(client, message):
+    """Deletes a list
+
+    Delete multiple lists by separating list names by commas. \
+    Type Delete All to delete all lists except trackedlist and ignore_lst.
+    """
     msg_text = " ".join(message.text.split(" ")[1:])
     chat_id = message.chat.id
     todotype = grouporprivate(message)
@@ -239,6 +268,11 @@ async def pass_handler(client, callback_query):
 
 @bot.on_callback_query()
 async def callback_handler(client, callback_query):
+    """Handles all callback queries
+
+    Edit button, delete task, show list are some of the major functions \
+    performed by this handler.
+    """
     callbackdata = callback_query.data
     todotype = grouporprivate(callback_query.message)
     chat_id = callback_query.message.chat.id
@@ -256,7 +290,7 @@ async def callback_handler(client, callback_query):
                 todotype, chat_id, callbackdata)
             lst_data = await bot.get_data(msg_list, from_usr)
             try:
-                await bot.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n————————————————————\n".format(callbackdata) + lst_data, parse_mode="md")
+                await bot.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n————————————————————\n".format(callbackdata) + lst_data, parse_mode="md", disable_web_page_preview=True)
                 await bot.edit_message_reply_markup(
                     chat_id, msg_id,
                     InlineKeyboardMarkup([
@@ -266,7 +300,8 @@ async def callback_handler(client, callback_query):
                     ]))
                 logging.info(
                     f"Successfully shown the {callbackdata} list to user")
-
+            except FloodWait as e:
+                await asyncio.sleep(e.x)
             except Exception as e:
                 logging.error(
                     f"Facing issues in editing inline keyboard while showing {callbackdata} list in chat_id {chat_id}", exc_info=True)

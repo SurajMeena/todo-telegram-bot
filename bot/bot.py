@@ -91,7 +91,7 @@ class bot(Client):
         updated_reply_msg = "This is a hashtag **{}** list \n————————————————————\n".format(hashtagtext) + lst_data
         inline_msg_id_node = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
         try:
-            await super().edit_message_text(chat_id, inline_msg_id_node, updated_reply_msg)
+            await super().edit_message_text(chat_id, inline_msg_id_node, updated_reply_msg, disable_web_page_preview=True)
             await super().edit_message_reply_markup(
                 chat_id, inline_msg_id_node,
                 InlineKeyboardMarkup([
