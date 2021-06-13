@@ -1,8 +1,7 @@
-import asyncio
-import logging
 import numpy as np
 from os import path
 import firebase_admin
+import asyncio, logging
 from pyrogram import Client
 from firebase_admin import db
 from configparser import ConfigParser
@@ -10,6 +9,7 @@ from pyrogram.errors import FloodWait, MessageNotModified, ButtonDataInvalid, Me
 from pyrogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 from .plugins.utils import msg_list_from_db, create_list_buttons, InlineButtonEdit
 
+# custom bot class inherited from client class in pyrogram 
 class bot(Client):
     def __init__(self, name):
         config_file = f"{name}.ini"
@@ -36,6 +36,7 @@ class bot(Client):
         print("bot stopped. Bye.")
 
 
+    # sends a message with inline keyboard when /start is used
     def create_list(self, todotype, message):
         chat_id = message.chat.id
         list_btns = create_list_buttons(todotype, chat_id)
@@ -43,7 +44,7 @@ class bot(Client):
         if len(list_btns[0]) == 0:
             msg = super().send_message(
                 chat_id,
-                "This is your to do list",
+                "These are lists that you are tracking -",
                 reply_markup=InlineKeyboardMarkup(
                 [
                     [
@@ -57,11 +58,12 @@ class bot(Client):
         else:
             msg = super().send_message(
                 chat_id,
-                "This is your to do list",
+                "These are lists that you are tracking -",
                 reply_markup=InlineKeyboardMarkup(buttons+list_btns)
             )
         return msg
 
+    # creates a formatted string out gathered data 
     async def get_data(self, data, from_usr):
         lst_data = ""
         j = 1
@@ -82,10 +84,11 @@ class bot(Client):
                 j += 1
         return lst_data
 
+    # edits the inline keyboard to display the string obtained from get_data
     async def show_list_in_keyboard(self, todotype, chat_id, hashtagtext, message):
         msg_list, from_usr = msg_list_from_db(todotype, chat_id, hashtagtext)
         lst_data = await self.get_data(msg_list, from_usr)
-        updated_reply_msg = "This is a hashtag {} list \n".format(hashtagtext) + lst_data
+        updated_reply_msg = "This is a hashtag **{}** list \n————————————————————\n".format(hashtagtext) + lst_data
         inline_msg_id_node = db.reference("/{}/{}/{}".format(todotype, chat_id,"bot_msg_id")).get("bot_msg_id")[0]
         try:
             await super().edit_message_text(chat_id, inline_msg_id_node, updated_reply_msg)
@@ -96,9 +99,11 @@ class bot(Client):
                         await InlineButtonEdit(),
                     ]
                 ]))
-            logging.info("Successfully added a task using /new command")
+            logging.info("Successfully added a task using commands new/tracklists/ignore or just on_message. Next lines provides more info on that")
+            logging.info(f"{message.text.split()[0]}")
         except MessageEditTimeExpired as e:
-            await super().send_message("It's been too long since you have used the /start command. Please /start@todogroup_bot to create a new inline keyboard")
+            logging.info("Message edit time expired this should never come but if it is then something's wrong")
+            await super().send_message(chat_id, "It's been too long since you have used the /start command. Please /start@todogroup_bot to create a new inline keyboard")
         except FloodWait as e:
             await asyncio.sleep(e.x)
         except MessageNotModified as e:

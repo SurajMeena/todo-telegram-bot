@@ -30,7 +30,7 @@ async def answer(client, inline_query):
         substr = [lst_name]
         filterd_list = Filter(hashtag_lst,substr)
         if lst_name in hashtag_lst:
-            msg_list, from_usr_lst = msg_list_from_db(todotype, from_usr, lst_name)
+            msg_list = msg_list_from_db(todotype, from_usr, lst_name)[0]
             for i, j in zip(msg_list, range(len(msg_list))):
                 try:
                     inline_options.append(inline_results_1(str(j+1)+". "+i, lst_name, thumb_url))
@@ -40,7 +40,7 @@ async def answer(client, inline_query):
             if(len(lst_name)==0):
                 filterd_list = hashtag_lst
             for lst_name in filterd_list:
-                msg_list, from_usr_lst = msg_list_from_db(todotype, from_usr, lst_name)
+                msg_list = msg_list_from_db(todotype, from_usr, lst_name)[0]
                 listname_data =""
                 for i in range(len(msg_list)):
                     listname_data += "{}. {} \n".format(i+1, msg_list[i])

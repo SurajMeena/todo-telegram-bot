@@ -14,7 +14,7 @@ async def InlineButtonEdit():
     return eval("InlineKeyboardButton('Edit list/Show lists', callback_data='edit')")
 
 def Filter(string, substr):
-    return [str for str in string if any(sub in str for sub in substr)]
+    return [stri for stri in string if any(sub in stri for sub in substr)]
 
 def grouporprivate(message):
     isgroup_msg = message.chat.type == "group" or message.chat.type == "supergroup"
@@ -26,7 +26,8 @@ def grouporprivate(message):
 def check_is_duplicate_item(todotype,chat_id,hashtagtext,new_msg):
     todo_hashtag_ref = db.reference("/{}/{}/{}".format(todotype,chat_id,hashtagtext))
     if todo_hashtag_ref.get() is not None:
-        for key,value in todo_hashtag_ref.get().items():
+        for i in todo_hashtag_ref.get().items():
+            value = i[1]
             if(value["msg"] == new_msg):
                 return True
     return False
@@ -59,15 +60,9 @@ def push_db(todotype, message, hashtagtext, msg_text):
             todo_hashtag_ref.push(msg_meta_details)
     else:
         todo_hashtag_ref.push(msg_meta_details)
-    return todo_ref,is_duplicate_item
+    return todo_ref, is_duplicate_item
 
 def addtodoitems(todotype, hashtagtext, message):
-    msg_from = "misc"
-    # try and except for handling anonymous user
-    try:
-        msg_from = message.from_user.id
-    except AttributeError:
-        msg_from = "anonymous"
     is_duplicate_item = False
     if hashtagtext == "newtodo":
         msg_text_list = message.text.split(' ')[1:]
@@ -79,7 +74,6 @@ def addtodoitems(todotype, hashtagtext, message):
         msg_text_list = list(np.char.strip(msg_text_list, " "))
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
-    chat_id = message.chat.id
     todo_ref,is_duplicate_item = push_db(todotype, message, hashtagtext, msg_text)
     pastmessages = todo_ref.get(hashtagtext)[0][hashtagtext]
     pastmessages_keys = list(pastmessages.keys())
@@ -93,7 +87,8 @@ def create_list_buttons(todotype, chat_id):
         return [[]]
     i = 1
     temp_lst = []
-    for key, value in get_lists.items():
+    for j in get_lists.items():
+        key = j[0]
         if key != "bot_msg_id":
             if i%3 != 0:
                 temp_lst.append(InlineButtonKey(key))
@@ -123,7 +118,8 @@ def msg_list_from_db(todotype, chat_id, hashtag):
     from_usr = []
     if entries is None:
         return msg_list, from_usr
-    for key, value in entries.items():
+    for i in entries.items():
+        value = i[1]
         msg_list.append(value["msg"])
         if todotype == "grouptodo":
             from_usr.append(value["msg_from"])
