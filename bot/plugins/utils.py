@@ -1,8 +1,9 @@
-from bot import bot
-from firebase_admin import db
-from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-import re
 import numpy as np
+from bot import bot
+import re, json, logging
+from firebase_admin import db
+from youtubesearchpython import *
+from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 
 def InlineButtonList(msg_key, msg):
     return eval("InlineKeyboardButton(msg, callback_data=msg_key)")
@@ -77,6 +78,17 @@ def addtodoitems(todotype, hashtagtext, message):
         msg_text_list = list(np.char.strip(msg_text_list, " "))
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
+    
+    pattern = re.findall(r"((?:https?:\/\/)?(www\.)?youtube\.com\S+?v=\S+)", msg_text)
+    for link in pattern:
+        try:
+            print(link[0])
+            video = Video.getInfo(link[0], mode=ResultMode.json)
+            x = json.loads(video)
+            msg_text = msg_text.replace(link[0], f"[{x['title']}]({link[0]})")
+            logging.info("created a markup link from url in msg")
+        except:
+            logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
     todo_ref,is_duplicate_item = push_db(todotype, message, hashtagtext, msg_text)
     pastmessages = todo_ref.get(hashtagtext)[0][hashtagtext]
     pastmessages_keys = list(pastmessages.keys())
