@@ -1,8 +1,8 @@
-from bot import bot
+from bot import bot_object
 from firebase_admin import db
 from .utils import Filter, inline_results, inline_results_1, msg_list_from_db
 
-@bot.on_inline_query()
+@bot_object.on_inline_query()
 async def answer(client, inline_query):
     inline_options = []
     todotype = "personaltodo"

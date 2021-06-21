@@ -5,3 +5,4 @@
 *.json
 *.pyc
 venv
+*/__pychache__

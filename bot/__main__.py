@@ -1,7 +1,4 @@
-import bot
-from bot import bot
-
+from bot import bot_object
 if __name__ == '__main__':
-    bot.client = bot
-    bot.run()
+    bot_object.run()
 

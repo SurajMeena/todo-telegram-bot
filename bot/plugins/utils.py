@@ -1,5 +1,4 @@
 import numpy as np
-from bot import bot
 import re, json, logging
 from firebase_admin import db
 from youtubesearchpython import *
