@@ -30,6 +30,7 @@ async def my_handler(client, message,hashtags=[]):
     Finds whether a msg contains a hashtag or not. If yes, then processes it \
     and saves it at appropriate place in database.
     """
+    print(message)
     if(message.via_bot is not None):
         return
     chat_id = message.chat.id

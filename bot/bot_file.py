@@ -112,7 +112,8 @@ class bot_cls(Client):
         except Exception as e:
             logging.error(f"Facing issues in adding a msg using /new command while editing inline keyboard in chat id [{chat_id}], and in msg_id {message.message_id}", exc_info=True)
     
-    def show_webpage_info(self, message):
+    @classmethod
+    def show_webpage_info(cls, message):
         if message.web_page is not None:
             display_url = super().get_messages(message.chat.id, message.message_id).web_page.display_url
             actual_url = super().get_messages(message.chat.id, message.message_id).web_page.url

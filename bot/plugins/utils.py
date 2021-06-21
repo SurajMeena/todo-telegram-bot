@@ -1,6 +1,5 @@
 import numpy as np
 import re, json, logging
-from bot import bot_instance
 from firebase_admin import db
 from youtubesearchpython import *
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
@@ -66,6 +65,8 @@ def push_db(todotype, message, hashtagtext, msg_text):
         todo_hashtag_ref.push(msg_meta_details)
     return todo_ref, is_duplicate_item
 
+
+
 def addtodoitems(todotype, hashtagtext, message):
     is_duplicate_item = False
     if hashtagtext == "newtodo":
@@ -89,7 +90,8 @@ def addtodoitems(todotype, hashtagtext, message):
     #         logging.info("created a markup link from url in msg")
     #     except:
     #         logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
-    web_page_info = bot_instance.show_webpage_info(message)
+    from bot.bot_file import bot_cls
+    web_page_info = bot_cls.show_webpage_info(message)
     if len(web_page_info) != 0:
         pattern = re.findall(web_page_info[0])
         for link in pattern:
