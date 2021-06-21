@@ -1,6 +1,6 @@
 import numpy as np
 import re, json, logging
-from .. import bot_instance
+from bot import bot_instance
 from firebase_admin import db
 from youtubesearchpython import *
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton

@@ -2,7 +2,7 @@ import os
 import logging
 import firebase_admin
 from firebase_admin import db
-from bot.bot import bot
+from bot.bot_file import bot_cls
 from dotenv import load_dotenv
 from configparser import ConfigParser
 
@@ -25,7 +25,7 @@ __version__ = '0.0.1'
 __author__ = 'suraj'
 
 # Global Variables
-bot_instance = bot(name)
+bot_instance = bot_cls(name)
 load_dotenv()
 
 databaseURL = os.getenv("databaseURL")

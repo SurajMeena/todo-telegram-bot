@@ -10,7 +10,7 @@ from pyrogram.types import ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyb
 from .plugins.utils import msg_list_from_db, create_list_buttons, InlineButtonEdit, InlineButtonInline
 
 # custom bot class inherited from client class in pyrogram 
-class bot(Client):
+class bot_cls(Client):
     def __init__(self, name):
         config_file = f"{name}.ini"
         config = ConfigParser()
@@ -112,7 +112,7 @@ class bot(Client):
         except Exception as e:
             logging.error(f"Facing issues in adding a msg using /new command while editing inline keyboard in chat id [{chat_id}], and in msg_id {message.message_id}", exc_info=True)
     
-    def show_webpage_info(cls, message):
+    def show_webpage_info(self, message):
         if message.web_page is not None:
             display_url = super().get_messages(message.chat.id, message.message_id).web_page.display_url
             actual_url = super().get_messages(message.chat.id, message.message_id).web_page.url
