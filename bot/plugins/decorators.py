@@ -12,8 +12,23 @@ from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create
 from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
 
-@bot.on_message(group=2)
-async def my_handler(client, message):
+replied_msg = filters.create(
+    lambda flt, client, query: query.reply_to_message is  not None)
+
+@bot.on_message(replied_msg,2)
+async def reply_handler(client,message):
+    if( message.text is not None and ".add" in message.text):
+            r = re.compile(r"(?:^|\s)([#])(\w+)")
+            hashtags = r.findall(message.text)
+            await my_handler(client,message.reply_to_message,hashtags)
+
+
+
+
+except_replied_msg_and_commands = filters.create(
+    lambda flt, client, query: query.reply_to_message is  None and len(query.command)==0)
+@bot.on_message(except_replied_msg_and_commands,group=2)
+async def my_handler(client, message,hashtags=[]):
     """Handler for messages containing hashtags
 
     Finds whether a msg contains a hashtag or not. If yes, then processes it \
@@ -26,8 +41,9 @@ async def my_handler(client, message):
     msg_text = message.text.markdown
     if(msg_text is None):
         return
-    r = re.compile(r"(?:^|\s)([#])(\w+)")
-    hashtags = r.findall(msg_text)
+    if(len(hashtags)==0):
+        r = re.compile(r"(?:^|\s)([#])(\w+)")
+        hashtags = r.findall(msg_text)
     if(len(hashtags) == 0):
         return
     tracked_list_ref = db.reference(
@@ -214,7 +230,7 @@ async def tracked(client, message):
 
 @bot.on_message(filters.command(["help", "help@todogroup_bot"]), group=1)
 async def help_handler(client, message):
-    await bot.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time. Watch [this](https://t.me/help_todogroup_bot/5)\n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list. Watch [this](https://t.me/help_todogroup_bot/5) \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags. Watch [this](https://t.me/help_todogroup_bot/5) \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot.\n\nHelp [channel](https://t.me/help_todogroup_bot) and Help [group](https://t.me/help_todogroup_chat) for usage, help, suggestions, etc.", parse_mode="md", disable_web_page_preview=True)
+    await bot.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time. Watch [this](https://t.me/help_todogroup_bot/5)\n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list. Watch [this](https://t.me/help_todogroup_bot/5) \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags. Watch [this](https://t.me/help_todogroup_bot/5) \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot.\n\nNote you can reply with .add #hashtagname to a message if you want to add it to your todolist (example .add #book )\n\nHelp [channel](https://t.me/help_todogroup_bot) and Help [group](https://t.me/help_todogroup_chat) for usage, help, suggestions, etc.", parse_mode="md", disable_web_page_preview=True)
 
 
 @bot.on_message(filters.command(["delete", "delete@todogroup_bot"]), group=1)
