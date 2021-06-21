@@ -25,7 +25,7 @@ __version__ = '0.0.1'
 __author__ = 'suraj'
 
 # Global Variables
-bot_object = bot(name)
+bot_instance = bot(name)
 load_dotenv()
 
 databaseURL = os.getenv("databaseURL")

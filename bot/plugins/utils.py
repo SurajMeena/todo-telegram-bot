@@ -1,5 +1,6 @@
 import numpy as np
 import re, json, logging
+from .. import bot_instance
 from firebase_admin import db
 from youtubesearchpython import *
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
@@ -78,17 +79,26 @@ def addtodoitems(todotype, hashtagtext, message):
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
     
-    pattern = re.findall(r"((?:https?:\/\/)?(www\.)?youtube\.com\S+?v=\S+)", msg_text)
-    for link in pattern:
-        try:
-            print(link[0])
-            video = Video.getInfo(link[0], mode=ResultMode.json)
-            x = json.loads(video)
-            msg_text = msg_text.replace(link[0], f"[{x['title']}]({link[0]})")
-            logging.info("created a markup link from url in msg")
-        except:
-            logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
-    todo_ref,is_duplicate_item = push_db(todotype, message, hashtagtext, msg_text)
+    # pattern = re.findall(r"((?:https?:\/\/)?(www\.)?youtube\.com\S+?v=\S+)", msg_text)
+    # for link in pattern:
+    #     try:
+    #         print(link[0])
+    #         video = Video.getInfo(link[0], mode=ResultMode.json)
+    #         x = json.loads(video)
+    #         msg_text = msg_text.replace(link[0], f"[{x['title']}]({link[0]})")
+    #         logging.info("created a markup link from url in msg")
+    #     except:
+    #         logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
+    web_page_info = bot_instance.show_webpage_info(message)
+    if len(web_page_info) != 0:
+        pattern = re.findall(web_page_info[0])
+        for link in pattern:
+            try:
+                msg_text = msg_text.replace(web_page_info[0], f"[{web_page_info[2]}]({web_page_info[1]})")
+                logging.info("created a markup link from url in msg")
+            except:
+                logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
+    todo_ref, is_duplicate_item = push_db(todotype, message, hashtagtext, msg_text)
     pastmessages = todo_ref.get(hashtagtext)[0][hashtagtext]
     pastmessages_keys = list(pastmessages.keys())
     return pastmessages_keys, is_duplicate_item
