@@ -9,20 +9,17 @@ from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
 
 replied_msg = filters.create(
-    lambda flt, client, query: query.reply_to_message is  not None)
+    lambda flt, client, query: query.reply_to_message is not None)
+except_replied_msg_and_commands = filters.create(
+    lambda flt, client, query: query.reply_to_message is None and query.command is None)
 
-@bot_instance.on_message(replied_msg,2)
-async def reply_handler(client,message):
+@bot_instance.on_message(replied_msg, 2)
+async def reply_handler(client, message):
     if( message.text is not None and ".add" in message.text):
             r = re.compile(r"(?:^|\s)([#])(\w+)")
             hashtags = r.findall(message.text)
-            await my_handler(client,message.reply_to_message,hashtags)
+            await my_handler(client, message.reply_to_message,hashtags)
 
-
-
-
-except_replied_msg_and_commands = filters.create(
-    lambda flt, client, query: query.reply_to_message is  None and query.command is None)
 @bot_instance.on_message(except_replied_msg_and_commands,group=2)
 async def my_handler(client, message,hashtags=[]):
     """Handler for messages containing hashtags
@@ -30,7 +27,6 @@ async def my_handler(client, message,hashtags=[]):
     Finds whether a msg contains a hashtag or not. If yes, then processes it \
     and saves it at appropriate place in database.
     """
-    print(message)
     if(message.via_bot is not None):
         return
     chat_id = message.chat.id
