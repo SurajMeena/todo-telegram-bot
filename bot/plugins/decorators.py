@@ -20,7 +20,7 @@ async def reply_handler(client, message):
             hashtags = r.findall(message.text)
             await my_handler(client, message.reply_to_message,hashtags)
 
-@bot_instance.on_message(except_replied_msg_and_commands,group=2)
+@bot_instance.on_message(except_replied_msg_and_commands, group=2)
 async def my_handler(client, message,hashtags=[]):
     """Handler for messages containing hashtags
 

@@ -1,3 +1,5 @@
+import requests
+from bs4 import BeautifulSoup
 import numpy as np
 import re, json, logging
 from firebase_admin import db
@@ -65,7 +67,20 @@ def push_db(todotype, message, hashtagtext, msg_text):
         todo_hashtag_ref.push(msg_meta_details)
     return todo_ref, is_duplicate_item
 
-
+def show_webpage_info(msg_text):
+    matched = re.findall('https?://\S+', msg_text)
+    for url in matched:
+        try:
+            # making requests instance
+            reqs = requests.get(url)
+            # using the BeaitifulSoup module
+            soup = BeautifulSoup(reqs.text, 'html.parser')
+            # displaying the title
+            title = soup.find('title').text
+            msg_text = msg_text.replace(url, f"[{title}]({url})")
+        except Exception as e:
+            logging.error(f"Unable to find title for {url}", exc_info=True)
+    return msg_text
 
 def addtodoitems(todotype, hashtagtext, message):
     is_duplicate_item = False
@@ -80,16 +95,16 @@ def addtodoitems(todotype, hashtagtext, message):
         msg_text_list = remove_all_specific_element(msg_text_list, "")     
         msg_text = " ".join(msg_text_list)
     
-    pattern = re.findall(r"((?:https?:\/\/)?(www\.)?youtube\.com\S+?v=\S+)", msg_text)
-    for link in pattern:
-        try:
-            print(link[0])
-            video = Video.getInfo(link[0], mode=ResultMode.json)
-            x = json.loads(video)
-            msg_text = msg_text.replace(link[0], f"[{x['title']}]({link[0]})")
-            logging.info("created a markup link from url in msg")
-        except:
-            logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
+    # pattern = re.findall(r"((?:https?:\/\/)?(www\.)?youtube\.com\S+?v=\S+)", msg_text)
+    # for link in pattern:
+    #     try:
+    #         print(link[0])
+    #         video = Video.getInfo(link[0], mode=ResultMode.json)
+    #         x = json.loads(video)
+    #         msg_text = msg_text.replace(link[0], f"[{x['title']}]({link[0]})")
+    #         logging.info("created a markup link from url in msg")
+    #     except:
+    #         logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
     # from bot.bot_file import bot_cls
     # web_page_info = bot_cls.show_webpage_info(message)
     # if len(web_page_info) != 0:
@@ -101,6 +116,7 @@ def addtodoitems(todotype, hashtagtext, message):
     #         except:
     #             logging.error(f"Couldn't create a markup link for {link}", exc_info=True)
     # above one only possible for userbots
+    msg_text = show_webpage_info(msg_text)
     todo_ref, is_duplicate_item = push_db(todotype, message, hashtagtext, msg_text)
     pastmessages = todo_ref.get(hashtagtext)[0][hashtagtext]
     pastmessages_keys = list(pastmessages.keys())
