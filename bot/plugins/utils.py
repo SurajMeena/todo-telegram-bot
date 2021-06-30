@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import numpy as np
 import re, json, logging
 from firebase_admin import db
-from youtubesearchpython import *
+# from youtubesearchpython import *
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
 
 def InlineButtonList(msg_key, msg):
