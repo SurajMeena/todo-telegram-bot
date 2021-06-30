@@ -12,7 +12,7 @@ r = re.compile(r"(?:^|\s)([#])(\w+)")
 
 
 replied_msg = filters.create(lambda flt, client, query: query.reply_to_message is not None) # check whether query message is replied to some message or not
-contains_hashtags = filters.create(lambda flt, client, query: len(r.findall(query.text))! = 0) #checks whether query message contains hashtag or not
+contains_hashtags = filters.create(lambda flt, client, query: len(r.findall(query.text)) != 0) #checks whether query message contains hashtag or not
 
 @bot_instance.on_message(replied_msg, 2)
 async def reply_handler(client, message):
