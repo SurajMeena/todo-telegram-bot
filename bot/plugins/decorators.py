@@ -7,20 +7,26 @@ from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, Re
 from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db, InlineButtonInline
 from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
+# find hashtags
+r = re.compile(r"(?:^|\s)([#])(\w+)")
 
-replied_msg = filters.create(
-    lambda flt, client, query: query.reply_to_message is not None)
-except_replied_msg_and_commands = filters.create(
-    lambda flt, client, query: query.reply_to_message is None and query.command is None)
+
+replied_msg = filters.create(lambda flt, client, query: query.reply_to_message is not None) # check whether query message is replied to some message or not
+contains_hashtags = filters.create(lambda flt, client, query: len(r.findall(query.text))! = 0) #checks whether query message contains hashtag or not
 
 @bot_instance.on_message(replied_msg, 2)
 async def reply_handler(client, message):
+    """ Handler for reply .add list messages
+    """
+    hashtags = r.findall(message.text)
     if( message.text is not None and ".add" in message.text):
-            r = re.compile(r"(?:^|\s)([#])(\w+)")
-            hashtags = r.findall(message.text)
             await my_handler(client, message.reply_to_message,hashtags)
+    else:
+            await my_handler(client, message,hashtags)
 
-@bot_instance.on_message(except_replied_msg_and_commands, group=2)
+
+
+@bot_instance.on_message(contains_hashtags,2)
 async def my_handler(client, message,hashtags=[]):
     """Handler for messages containing hashtags
 
@@ -35,7 +41,6 @@ async def my_handler(client, message,hashtags=[]):
     if(msg_text is None):
         return
     if(len(hashtags)==0):
-        r = re.compile(r"(?:^|\s)([#])(\w+)")
         hashtags = r.findall(msg_text)
     if(len(hashtags) == 0):
         return
