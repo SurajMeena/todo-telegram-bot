@@ -4,30 +4,31 @@ from pyrogram import filters
 from firebase_admin import db
 import re, sys, time, asyncio, logging
 from pyrogram.types import InlineQueryResultArticle, InputTextMessageContent, ReplyKeyboardMarkup, InlineKeyboardMarkup, InlineKeyboardButton
-from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db, InlineButtonInline
+from .utils import grouporprivate, msg_list_from_db, create_list_buttons, create_buttons, InlineButtonEdit, addtodoitems, remove_all_specific_element, check_is_duplicate_item, push_db, InlineButtonInline, InlineButtonGroup
 from pyrogram.errors import ButtonDataInvalid, FloodWait, MessageNotModified
 
 # find hashtags
 r = re.compile(r"(?:^|\s)([#])(\w+)")
+# check whether query message is replied to some message or not
+replied_msg = filters.create(lambda flt, client, query: query.reply_to_message is not None)
+#checks whether query message contains hashtag or not
+contains_hashtags = filters.create(lambda flt, client, query: len(r.findall(query.text)) != 0)
 
-
-replied_msg = filters.create(lambda flt, client, query: query.reply_to_message is not None) # check whether query message is replied to some message or not
-contains_hashtags = filters.create(lambda flt, client, query: len(r.findall(query.text)) != 0) #checks whether query message contains hashtag or not
-
-@bot_instance.on_message(replied_msg, 2)
+@bot_instance.on_message(filters.text & replied_msg, 2)
 async def reply_handler(client, message):
-    """ Handler for reply .add list messages
+    """ Handler for adding replied to message in list
+
+    Checks whether current message contains '.add #name' in reply to a message. If yes then it adds original message in 'name' list. 
     """
     hashtags = r.findall(message.text)
-    if( message.text is not None and ".add" in message.text):
-            await my_handler(client, message.reply_to_message,hashtags)
+    if message.text is not None and ".add" in message.text:
+        await my_handler(client, message.reply_to_message, hashtags)
     else:
-            await my_handler(client, message,hashtags)
+        await my_handler(client, message, hashtags)
 
 
-
-@bot_instance.on_message(contains_hashtags,2)
-async def my_handler(client, message,hashtags=[]):
+@bot_instance.on_message(filters.text & contains_hashtags, 2)
+async def my_handler(client, message, hashtags=[]):
     """Handler for messages containing hashtags
 
     Finds whether a msg contains a hashtag or not. If yes, then processes it \
@@ -40,9 +41,9 @@ async def my_handler(client, message,hashtags=[]):
     msg_text = message.text.markdown
     if(msg_text is None):
         return
-    if(len(hashtags)==0):
+    if len(hashtags) == 0:
         hashtags = r.findall(msg_text)
-    if(len(hashtags) == 0):
+    if len(hashtags) == 0:
         return
     tracked_list_ref = db.reference(
         "/{}/{}/{}".format(todotype, chat_id, "trackedlist"))
@@ -228,7 +229,33 @@ async def tracked(client, message):
 
 @bot_instance.on_message(filters.command(["help", "help@todogroup_bot"]), group=1)
 async def help_handler(client, message):
-    await bot_instance.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time. Watch [this](https://t.me/help_todogroup_bot/5)\n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list. Watch [this](https://t.me/help_todogroup_bot/5) \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags. Watch [this](https://t.me/help_todogroup_bot/5) \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot.\n\nNote you can reply with .add #hashtagname to a message if you want to add it to your todolist (example .add #book )\n\nHelp [channel](https://t.me/help_todogroup_bot) and Help [group](https://t.me/help_todogroup_chat) for usage, help, suggestions, etc.", parse_mode="md", disable_web_page_preview=True)
+    await bot_instance.send_message(message.chat.id, "/start@todogroup_bot - Shows all available lists and starts the bot for first time. Watch [this](https://t.me/help_todogroup_bot/5)\n/tracklists@todogroup_bot - Enter a hashtag name, enter multiple hashtag names separated by comma to track messages associated with a certain hashtag to be added in a list. Watch [this](https://t.me/help_todogroup_bot/5) \n/new@todogroup_bot - Creates a new task in a separate list named 'newtodo' independent of hashtags. Watch [this](https://t.me/help_todogroup_bot/5) \n/showtrackedlists@todogroup_bot - Shows all the lists which are being tracked for new additions \n/ignore@todogroup_bot Ignore messages with certain hashtags to be ignored by bot. Input format is same as /tracklists. \n/delete@todogroup_bot - Deletes a single list or all lists in one go. Please type list names separated by commas to delete multiple lists or type 'Delete All' to delete all lists except trackedlist \n/help@todogroup_bot - let's you know more on how to use this bot.\n\nRefer todogroup_bot channel and group for usage, tips, help, suggestions, etc.",
+    parse_mode="md",
+    reply_markup=InlineKeyboardMarkup(
+            [
+                [  # First row
+                    InlineKeyboardButton(  # Generates a callback query when pressed
+                        "Channel",
+                        url="https://t.me/help_todogroup_bot"
+                    ),
+                    InlineKeyboardButton(  # Opens a web URL
+                        "Group",
+                        url="https://t.me/help_todogroup_chat"
+                    ),
+                ],
+                [  # First row
+                    InlineKeyboardButton(  # Generates a callback query when pressed
+                        "Report A Bug",
+                        url="https://t.me/help_todogroup_chat"
+                    ),
+                    InlineKeyboardButton(  # Opens a web URL
+                        "Suggest A Feature",
+                        url="https://t.me/help_todogroup_chat"
+                    ),
+                ],
+            ]
+        ),
+        disable_web_page_preview=True)
 
 
 @bot_instance.on_message(filters.command(["delete", "delete@todogroup_bot"]), group=1)
@@ -311,6 +338,10 @@ async def callback_handler(client, callback_query):
                         [
                             await InlineButtonEdit(),
                             await InlineButtonInline(),
+                        ],
+                        [
+                            await InlineButtonGroup("Report A Bug"),
+                            await InlineButtonGroup("Suggest A Feature")
                         ]
                     ]))
                 logging.info(
