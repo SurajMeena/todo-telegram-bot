@@ -20,7 +20,6 @@ async def reply_handler(client, message):
 
     Checks whether current message contains '.add #name' in reply to a message. If yes then it adds original message in 'name' list. 
     """
-    print("on_message chal rha reply wala")
     hashtags = r.findall(message.text)
     if message.text is not None and ".add" in message.text:
         await my_handler(client, message.reply_to_message, hashtags)
@@ -35,8 +34,6 @@ async def my_handler(client, message, hashtags=[]):
     Finds whether a msg contains a hashtag or not. If yes, then processes it \
     and saves it at appropriate place in database.
     """
-    print("on message chal rha normal wala")
-    print(hashtags)
     chat_id = message.chat.id
     todotype = grouporprivate(message)
     msg_text = message.text.markdown
