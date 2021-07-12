@@ -6,9 +6,7 @@ from .utils import Filter, inline_results, inline_results_1, msg_list_from_db
 async def answer(client, inline_query):
     inline_options = []
     todotype = "personaltodo"
-    # thumb_url = "https://data.alemi.dev/todo-small.png"
     thumb_url = "https://imgur.com/9nahZuY.png"
-    # thumb_url = "https://imgur.com/YxvePl2.png"
     # try:
     from_usr = inline_query.from_user.id
     # except:
