@@ -19,7 +19,7 @@ async def InlineButtonInline():
     return eval("InlineKeyboardButton('Use Inline', switch_inline_query_current_chat='')")
 
 async def InlineButtonGroup(info):
-    return eval("InlineKeyboardButton(info, url='https://t.me/help_todogroup_chat')")
+    return eval("InlineKeyboardButton(info, url='https://t.me/messtotelebot')")
 
 def Filter(string, substr):
     return [stri for stri in string if any(sub in stri for sub in substr)]

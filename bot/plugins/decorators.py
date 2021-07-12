@@ -241,15 +241,21 @@ async def help_handler(client, message):
                         url="https://t.me/help_todogroup_chat"
                     ),
                 ],
+                # [  # First row
+                #     InlineKeyboardButton(  # Generates a callback query when pressed
+                #         "Report A Bug",
+                #         url="https://t.me/help_todogroup_chat"
+                #     ),
+                #     InlineKeyboardButton(  # Opens a web URL
+                #         "Suggest A Feature",
+                #         url="https://t.me/help_todogroup_chat"
+                #     ),
+                # ],
                 [  # First row
                     InlineKeyboardButton(  # Generates a callback query when pressed
-                        "Report A Bug",
-                        url="https://t.me/help_todogroup_chat"
-                    ),
-                    InlineKeyboardButton(  # Opens a web URL
-                        "Suggest A Feature",
-                        url="https://t.me/help_todogroup_chat"
-                    ),
+                        "Not interested in Joining groups. Reach through Support Bot",
+                        url="https://t.me/messtotelebot"
+                    )
                 ],
             ]
         ),
@@ -329,7 +335,7 @@ async def callback_handler(client, callback_query):
                 todotype, chat_id, callbackdata)
             lst_data = await bot_instance.get_data(msg_list, from_usr)
             try:
-                await bot_instance.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n————————————————————\n".format(callbackdata) + lst_data, parse_mode="md", disable_web_page_preview=True)
+                await bot_instance.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n——————————————————f\n".format(callbackdata) + lst_data, parse_mode="md", disable_web_page_preview=True)
                 await bot_instance.edit_message_reply_markup(
                     chat_id, msg_id,
                     InlineKeyboardMarkup([
@@ -338,8 +344,8 @@ async def callback_handler(client, callback_query):
                             await InlineButtonInline(),
                         ],
                         [
-                            await InlineButtonGroup("Report A Bug"),
-                            await InlineButtonGroup("Suggest A Feature")
+                            await InlineButtonGroup("Report A Bug / Suggest A Feature"),
+                            # await InlineButtonGroup("Suggest A Feature")
                         ]
                     ]))
                 logging.info(
