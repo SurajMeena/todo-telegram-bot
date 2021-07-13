@@ -253,7 +253,7 @@ async def help_handler(client, message):
                 # ],
                 [  # First row
                     InlineKeyboardButton(  # Generates a callback query when pressed
-                        "Not interested in Joining groups. Reach through Support Bot",
+                        "Reach directly through Support Bot",
                         url="https://t.me/messtotelebot"
                     )
                 ],
@@ -335,7 +335,7 @@ async def callback_handler(client, callback_query):
                 todotype, chat_id, callbackdata)
             lst_data = await bot_instance.get_data(msg_list, from_usr)
             try:
-                await bot_instance.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n——————————————————f\n".format(callbackdata) + lst_data, parse_mode="md", disable_web_page_preview=True)
+                await bot_instance.edit_message_text(chat_id, msg_id, "This is a hashtag **{}** list \n————————————————\n".format(callbackdata) + lst_data, parse_mode="md", disable_web_page_preview=True)
                 await bot_instance.edit_message_reply_markup(
                     chat_id, msg_id,
                     InlineKeyboardMarkup([
