@@ -1,8 +1,9 @@
 *.session
-*.ini
+todogroup_bot.ini
 .env
 *.log
-*.json
+todogroupbot-db-firebase-adminsdk-nulpi-66455cc53c.json
+todolistbot-ac231-firebase-adminsdk-fjtwn-69f03a1970.json
 *.pyc
 venv
 */__pychache__
