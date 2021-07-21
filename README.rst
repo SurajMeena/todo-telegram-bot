@@ -13,12 +13,12 @@ Join our community for discussions, feature requests and reporting bugs for todo
 *Stay tuned for feature updates and bug fixes on our* `Telegram Channel <https://telegram.me/todogroup_bot>`_.
 
 .. image:: https://img.shields.io/badge/Python-3.7+-yellow.svg?logo=python
-   :target: https://telegram.me/todogroup_bot
+   :target: https://www.python.org
    :alt: Supported Python versions
 
 .. image:: https://img.shields.io/badge/Pyrogram-orange.svg?logo=pyrogram
-   :target: https://core.telegram.org/bots/api-changelog
-   :alt: Supported Bot API versions
+   :target: https://docs.pyrogram.org
+   :alt: Supported Pyrogram versions
 
 .. image:: https://img.shields.io/badge/License-MIT-blue.svg?logo=MIT
    :target: https://www.gnu.org/licenses/lgpl-3.0.html
