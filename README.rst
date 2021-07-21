@@ -3,7 +3,7 @@
 
 .. image:: https://github.com/img/todogroup_bot.png
    :align: center
-   :target: https://telegram.me/todogroup_bot
+   :target: https://github.com/SurajMeena/todo-telegram-bot/blob/master/img/todogroup_bot.png
    :alt: todo-telegram-bot Logo
 
 We have made you a bot you can't refuse
