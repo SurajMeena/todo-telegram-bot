@@ -123,21 +123,21 @@ You can get help in several ways:
 
 1. We have a todogroup_bot Channel and Group for relaying updates and discussions
 
-.. image:: https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram
-   :target: https://telegram.me/help_todogroup_bot
-   :alt: Bot Help Channel
+   .. image:: https://img.shields.io/badge/Telegram-Group-blue.svg?logo=telegram
+      :target: https://telegram.me/help_todogroup_bot
+      :alt: Bot Help Channel
 
-.. image:: https://img.shields.io/badge/Telegram-Group-red.svg?logo=telegram
-   :target: https://telegram.me/help_todogroup_chat
-   :alt: Bot Help Group
+   .. image:: https://img.shields.io/badge/Telegram-Group-red.svg?logo=telegram
+      :target: https://telegram.me/help_todogroup_chat
+      :alt: Bot Help Group
 
-Join us!
+   Join us!
 
 2. Report bugs, request new features or ask questions through our group or you can also contact us through our support bot.
 
-.. image:: https://img.shields.io/badge/Support-Bot-blue.svg?logo=telegram
-   :target: https://telegram.me/messtotelebot
-   :alt: Support Bot
+   .. image:: https://img.shields.io/badge/Support-Bot-blue.svg?logo=telegram
+      :target: https://telegram.me/messtotelebot
+      :alt: Support Bot
    
 ==============================
 Contribution and Contributors
