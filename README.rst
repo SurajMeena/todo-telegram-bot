@@ -70,12 +70,12 @@ Pre-requisites
 ---------------
 * Firebase Key
 
-   1. Open `Firebase <https://firebase.google.com>`_ and Sign in using a google account
-   2. Click on Go to Console option followed by clicking on adding a project
-   3. Follow appropriate dialogs to create a new project
-   4. In your project, go to realtime database and create a new databaset there
-   5. Now Go to Project Settings and create a new private key under service accounts.
-   6. Store downloaded key in todo-telegram-bot folder
+   * Open `Firebase <https://firebase.google.com>`_ and Sign in using a google account
+   * Click on Go to Console option followed by clicking on adding a project
+   * Follow appropriate dialogs to create a new project
+   * In your project, go to realtime database and create a new databaset there
+   * Now Go to Project Settings and create a new private key under service accounts.
+   * Store downloaded key in todo-telegram-bot folder
 * Telegram API ID and API Hash
 * Bot Token from Botfather
 
