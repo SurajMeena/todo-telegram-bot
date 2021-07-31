@@ -77,7 +77,7 @@ def show_webpage_info(msg_text):
     # ic(matched)
     # ic(should_not_match)
     if len(should_not_match) != 0 and len(matched) != 0:
-        ic("yeh kyun nahi chal rha")
+        # ic("yeh kyun nahi chal rha")
         return msg_text
     else:
         for url in matched:
