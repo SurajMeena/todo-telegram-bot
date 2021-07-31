@@ -72,39 +72,28 @@ def push_db(todotype, message, hashtagtext, msg_text):
     return todo_ref, is_duplicate_item
 
 def show_webpage_info(msg_text):
-    matched = re.findall('https?://\S+', msg_text)
-    for url in matched:
-        try:
-            # making requests instance
-            reqs = requests.get(url)
-            # using the BeaitifulSoup module
-            soup = BeautifulSoup(reqs.text, 'html.parser')
-            # displaying the title
-            title = soup.find('title').text
-            msg_text = msg_text.replace(url, f"[{title}]({url})")
-        except Exception as e:
-            logging.error(f"Unable to find title for {url}", exc_info=True)
-    return msg_text
-    #     should_not_match = re.findall('[[^][]+]\(((http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/\~+#-]*[\w@?^=%&/\~+#-])?)\)', msg_text)
-    # matched = re.findall('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/\~+#-]*[\w@?^=%&/\~+#-])?', msg_text)
+    should_not_match = re.findall('\[[^][]+]\((http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/\~+#-]*[\w@?^=%&/\~+#-])?\)', msg_text)
+    matched = re.findall('(http|ftp|https)://([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/\~+#-]*[\w@?^=%&/\~+#-])?', msg_text)
     # ic(matched)
     # ic(should_not_match)
-    # if len(should_not_match) != 0 and len(matched) != 0:
-    #     ic("yeh kyun nahi chal rha")
-    #     return msg_text
-    # else:
-    #     for url in matched:
-    #         try:
-    #             # making requests instance
-    #             reqs = requests.get(url)
-    #             # using the BeaitifulSoup module
-    #             soup = BeautifulSoup(reqs.text, 'html.parser')
-    #             # displaying the title
-    #             title = soup.find('title').text
-    #             msg_text = msg_text.replace(url, f"[{title}]({url})")
-    #         except Exception as e:
-    #             logging.error(f"Unable to find title for {url}", exc_info=True)
-    # return msg_text
+    if len(should_not_match) != 0 and len(matched) != 0:
+        ic("yeh kyun nahi chal rha")
+        return msg_text
+    else:
+        for url in matched:
+            try:
+                # making requests instance
+                url = url[0] + "://" + url[1] + url[2]
+                # ic(url)
+                reqs = requests.get(url)
+                # using the BeaitifulSoup module
+                soup = BeautifulSoup(reqs.text, 'html.parser')
+                # displaying the title
+                title = soup.find('title').text
+                msg_text = msg_text.replace(url, f"[{title}]({url})")
+            except Exception as e:
+                logging.error(f"Unable to find title for {url}", exc_info=True)
+    return msg_text
 
 def addtodoitems(todotype, hashtagtext, message):
     is_duplicate_item = False
