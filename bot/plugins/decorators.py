@@ -1,4 +1,5 @@
 import numpy as np
+# from icecream import ic
 from bot import bot_instance
 from pyrogram import filters
 from firebase_admin import db
@@ -37,6 +38,7 @@ async def my_handler(client, message, hashtags=[]):
     chat_id = message.chat.id
     todotype = grouporprivate(message)
     msg_text = message.text.markdown
+    # ic(msg_text)
     if(msg_text is None):
         return
     if len(hashtags) == 0:
@@ -371,16 +373,16 @@ async def callback_handler(client, callback_query):
             except ButtonDataInvalid as e:
                 logging.info(
                     f"The button callback data contains invalid data or exceeds 64 bytes {value} in {hashtag}")
-                sze = sys.getsizeof(key + "___" + hashtag)
+                sze = sys.getsizeof(key + "///" + hashtag)
                 logging.info(
-                    f"{sze} is the number of bytes for {key + '___' + hashtag}")
+                    f"{sze} is the number of bytes for {key + '///' + hashtag}")
             except Exception as e:
                 logging.error(
                     f"Facing issues in showing inline keyboard while clicking edit list button msg_id, chat_id {msg_id} {chat_id}]", exc_info=True)
         elif callbackdata == "additem":
             await help_handler(client, callback_query.message)
         else:
-            key, hashtag = callbackdata.split('___')
+            key, hashtag = callbackdata.split('///')
             todo_ref = db.reference(
                 "/{}/{}/{}".format(todotype, chat_id, hashtag))
             if(todo_ref.get() is not None):
@@ -401,9 +403,9 @@ async def callback_handler(client, callback_query):
             except ButtonDataInvalid as e:
                 logging.info(
                     f"The button callback data contains invalid data or exceeds 64 bytes {value} in {hashtag}")
-                sze = sys.getsizeof(key + "___" + hashtag)
+                sze = sys.getsizeof(key + "///" + hashtag)
                 logging.info(
-                    f"{sze} is the number of bytes for {key + '___' + hashtag}")
+                    f"{sze} is the number of bytes for {key + '///' + hashtag}")
             except FloodWait as e:
                 await callback_query.answer(f"Uh-oh...Slow down, Please wait {e.x} seconds to get refreshed view", show_alert=True)
                 time.sleep(e.x)
