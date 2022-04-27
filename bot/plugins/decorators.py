@@ -153,7 +153,7 @@ async def tracklist_handler(client, message):
     for listname in hashtags_lst:
         if len(listname) > 36:
             hashtags_lst.remove(listname)
-            await bot_instance.send_message(chat_id, "Fuck Off! What are you writing ? Ramayana")
+            await bot_instance.send_message(chat_id, "Oops! hashtag list name length must be less than 36")
         else:
             hash_str = "#" + listname
             matched = re.match(r"^#\w+$", hash_str)
