@@ -21,8 +21,8 @@ class bot_cls(Client):
         api_hash = config.get('pyrogram', 'api_hash')
         super().__init__(
             name,
-            config_file=config_file,
-            workers=16,
+            api_hash=api_hash,
+            api_id=api_id,
             plugins=plugins,
             workdir="./",
         )

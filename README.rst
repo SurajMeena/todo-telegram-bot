@@ -101,7 +101,7 @@ On Terminal or VPS
 
 .. code:: shell
 
-   $ pip install -r requirements.txt
+   $ pip install -r requirements.txt --nodeps
 
 4. Copy and Rename sample_config.ini to todogroup_bot.ini and configure it's content accordingly
 
